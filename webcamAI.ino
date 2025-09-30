@@ -97,44 +97,6 @@ void processCommand(String command, Stream& serialPort) {
 	}  
 }
 
-void printSystemStatus(Stream& serialPort) {
-	serialPort.println("=== STATO SISTEMA ===");
-	serialPort.print("Camera: ");
-	serialPort.println(digitalRead(2) == LOW ? "ACCESA" : "SPENTA");
-	serialPort.print("Riscaldamento: ");
-	serialPort.println(digitalRead(3) == HIGH ? "ACCESO" : "SPENTO");
-	serialPort.print("PC: ");
-	serialPort.println(digitalRead(4) == LOW ? "ACCESO" : "SPENTO");
-	serialPort.print("Ventola: ");
-	serialPort.println(digitalRead(5) == HIGH ? "ACCESA" : "SPENTA");
-	
-	// Lettura sensori con gestione errori
-	float temp = sht31.readTemperature();
-	float hum = sht31.readHumidity();
-	
-	serialPort.print("Temperatura: ");
-	if (!isnan(temp)) {
-		serialPort.print(temp, 1);
-		serialPort.println(" °C");
-	} else {
-		serialPort.println("ERRORE");
-	}
-	
-	serialPort.print("Umidità: ");
-	if (!isnan(hum)) {
-		serialPort.print(hum, 1);
-		serialPort.println(" %");
-	} else {
-		serialPort.println("ERRORE");
-	}
-	
-	unsigned long timeSinceHeartbeat = millis() - lastHeartbeatTime;
-	serialPort.print("Ultimo heartbeat: ");
-	serialPort.print(timeSinceHeartbeat / 1000);
-	serialPort.println(" secondi fa");
-	serialPort.println("====================");
-}
-
 void resetFunc() {
 	digitalWrite(4, HIGH);
 	lastHeartbeatTime = millis();
