@@ -38,22 +38,18 @@ void loop() {
 	// Controllo del timeout dell'heartbeat
 	// Se non riceve un segnale di Heartbeat da 10 minuti resetta il PC
 	if (millis() - lastHeartbeatTime > HEARTBEAT_TIMEOUT) {
-		Serial.println("Timeout heartbeat - Reset PC");
-		WebcamSerial.println("Timeout heartbeat - Reset PC");
 		resetFunc();
 	}	
 	
 	// Gestione comandi da WebcamSerial
 	if (WebcamSerial.available()) {
 		String command = WebcamSerial.readString();
-		command.trim(); // Rimuove spazi e newline
 		processCommand(command, WebcamSerial);
 	}
 	
 	// Gestione comandi da Serial
 	if (Serial.available()) {
 		String command = Serial.readString();
-		command.trim(); // Rimuove spazi e newline
 		processCommand(command, Serial);
 	}
 }
@@ -61,74 +57,44 @@ void loop() {
 void processCommand(String command, Stream& serialPort) {
 	if (command == "b") { // Heartbeat signal
 		lastHeartbeatTime = millis();
-		serialPort.println("Heartbeat ricevuto");
 		
 	} else if (command == "C") {  // turn on Camera
 		digitalWrite(2, LOW);
-		serialPort.println("Camera ACCESA");
 		
 	} else if (command == "c") {  // turn off Camera
 		digitalWrite(2, HIGH);
-		serialPort.println("Camera SPENTA");
 		
 	} else if (command == "H") {  // turn on Heating
 		digitalWrite(3, HIGH);
-		serialPort.println("Riscaldamento ACCESO");
 		
 	} else if (command == "h") {  // turn off Heating
 		digitalWrite(3, LOW);
-		serialPort.println("Riscaldamento SPENTO");
 		
 	} else if (command == "P") {  // turn on PC
 		digitalWrite(4, LOW);
-		serialPort.println("PC ACCESO");
 		
 	} else if (command == "p") {  // turn off PC
 		digitalWrite(4, HIGH);
-		serialPort.println("PC SPENTO");
 		
 	} else if (command == "F") {  // turn on Fan
 		digitalWrite(5, HIGH);
-		serialPort.println("Ventola ACCESA");
 		
 	} else if (command == "f") {  // turn off Fan
 		digitalWrite(5, LOW);
-		serialPort.println("Ventola SPENTA");
-		
-	} else if (command == "n") {  // Test connessione
-		if (&serialPort == &Serial) {
-			serialPort.println("Serial OK");
-		} else {
-			serialPort.println("Software Serial OK");
-		}
 		
 	} else if (command == "t") {  // Lettura temperatura
 		float t_celsius = sht31.readTemperature();
 		if (!isnan(t_celsius)) {
-			serialPort.print("Temperatura: ");
 			serialPort.print(t_celsius, 1);
-			serialPort.println(" °C");
-		} else {
-			serialPort.println("ERRORE: Impossibile leggere la temperatura");
-		}
+		} 
 		
 	} else if (command == "u") {  // Lettura umidità
 		float h_percent = sht31.readHumidity();
 		if (!isnan(h_percent)) {
-			serialPort.print("Umidità: ");
 			serialPort.print(h_percent, 1);
-			serialPort.println(" %");
-		} else {
-			serialPort.println("ERRORE: Impossibile leggere l'umidità");
-		}
+		} 
 		
-	} else if (command == "s") {  // Stato sistema
-		printSystemStatus(serialPort);
-		
-	} else if (command.length() > 0) { // Comando sconosciuto
-		serialPort.print("Comando sconosciuto: ");
-		serialPort.println(command);
-	}
+	}  
 }
 
 void printSystemStatus(Stream& serialPort) {
